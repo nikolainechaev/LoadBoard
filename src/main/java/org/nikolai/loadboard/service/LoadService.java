@@ -1,77 +1,44 @@
 package org.nikolai.loadboard.service;
 
 import org.nikolai.loadboard.entity.Load;
-import org.nikolai.loadboard.entity.User;
-import org.nikolai.loadboard.exception.ResourceNotFoundException;
 import org.nikolai.loadboard.repository.LoadRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LoadService {
+
     private final LoadRepository loadRepository;
 
     public LoadService(LoadRepository loadRepository) {
         this.loadRepository = loadRepository;
     }
 
-    /**
-     * Retrieve all loads that have not been booked.
-     *
-     * @return list of available loads
-     */
-    public List<Load> findAllAvailableLoads() {
-        return loadRepository.findByBookedByIsNull();
+    public List<Load> getAllLoads() {
+        return loadRepository.findAll();
     }
 
-    /**
-     * Retrieve loads booked by a specific user.
-     *
-     * @param userId ID of the user
-     * @return list of booked loads
-     */
-    public List<Load> findBookedLoads(Long userId) {
-        return loadRepository.findByBookedById(userId);
+    public Optional<Load> getLoadById(Long id) {
+        return loadRepository.findById(id);
     }
 
-    /**
-     * Post a new load to the load board.
-     *
-     * @param load Load entity to post
-     * @return posted Load entity
-     */
-    public Load postLoad(Load load) {
+    public Load createLoad(Load load) {
         return loadRepository.save(load);
     }
 
-    /**
-     * Delete a load by its ID.
-     *
-     * @param loadId ID of the load to delete
-     */
-    public void deleteLoad(Long loadId) {
-        Load load = loadRepository.findById(loadId)
-                .orElseThrow(() -> new ResourceNotFoundException("Load not found with ID: " + loadId));
-        loadRepository.delete(load);
+    public Load updateLoad(Long id, Load updatedLoad) {
+        return loadRepository.findById(id).map(load -> {
+            load.setOrigin(updatedLoad.getOrigin());
+            load.setDestination(updatedLoad.getDestination());
+            load.setCargoType(updatedLoad.getCargoType());
+            load.setWeight(updatedLoad.getWeight());
+            return loadRepository.save(load);
+        }).orElseThrow(() -> new RuntimeException("Load not found"));
     }
 
-    /**
-     * Book a load by a user.
-     *
-     * @param loadId ID of the load to book
-     * @param user   User booking the load
-     * @return the booked Load entity
-     */
-    public Load bookLoad(Long loadId, User user) {
-        Load load = loadRepository.findById(loadId)
-                .orElseThrow(() -> new ResourceNotFoundException("Load not found with ID: " + loadId));
-
-        if (load.getBookedBy() != null) {
-            throw new RuntimeException("Load already booked.");
-        }
-
-        load.setBookedBy(user);
-        return loadRepository.save(load);
+    public void deleteLoad(Long id) {
+        loadRepository.deleteById(id);
     }
 }

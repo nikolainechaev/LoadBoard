@@ -1,34 +1,51 @@
 package org.nikolai.loadboard.controller;
 
 import org.nikolai.loadboard.entity.Load;
-import org.nikolai.loadboard.entity.User;
 import org.nikolai.loadboard.service.LoadService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/loads")
+@RequestMapping("/api/loads")
 public class LoadController {
+
     private final LoadService loadService;
 
     public LoadController(LoadService loadService) {
         this.loadService = loadService;
     }
 
-    @GetMapping("/available")
-    public List<Load> getAvailableLoads() {
-        return loadService.findAllAvailableLoads();
+    @GetMapping
+    public List<Load> getAllLoads() {
+        return loadService.getAllLoads();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Load> getLoadById(@PathVariable Long id) {
+        return loadService.getLoadById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Load postLoad(@RequestBody Load load) {
-        return loadService.postLoad(load);
+    public Load createLoad(@RequestBody Load load) {
+        return loadService.createLoad(load);
     }
 
-    @PutMapping("/{id}/book")
-    public Load bookLoad(@PathVariable Long id, @RequestBody User user) {
-        return loadService.bookLoad(id, user);
+    @PutMapping("/{id}")
+    public ResponseEntity<Load> updateLoad(@PathVariable Long id, @RequestBody Load updatedLoad) {
+        try {
+            return ResponseEntity.ok(loadService.updateLoad(id, updatedLoad));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLoad(@PathVariable Long id) {
+        loadService.deleteLoad(id);
+        return ResponseEntity.noContent().build();
     }
 }
-
