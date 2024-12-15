@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 @Entity
 public class Load {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     private String origin;
     private String destination;
