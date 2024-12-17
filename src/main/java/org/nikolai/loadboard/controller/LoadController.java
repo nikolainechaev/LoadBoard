@@ -1,6 +1,7 @@
 package org.nikolai.loadboard.controller;
 
 import org.nikolai.loadboard.entity.Load;
+import org.nikolai.loadboard.entity.LoadStatus;
 import org.nikolai.loadboard.service.LoadService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +44,31 @@ public class LoadController {
         }
     }
 
+    @PatchMapping("/{id}/assign-carrier")
+    public ResponseEntity<Load> assignCarrierToLoad(
+            @PathVariable Long id,
+            @RequestParam Long carrierId) {
+        try {
+            return ResponseEntity.ok(loadService.assignCarrierToLoad(id, carrierId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLoad(@PathVariable Long id) {
         loadService.deleteLoad(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Load> updateLoadStatus(
+            @PathVariable Long id,
+            @RequestParam LoadStatus status) {
+        try {
+            return ResponseEntity.ok(loadService.updateLoadStatus(id, status));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 }
