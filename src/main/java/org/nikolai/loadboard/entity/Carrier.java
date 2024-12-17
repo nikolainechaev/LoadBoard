@@ -1,9 +1,11 @@
 package org.nikolai.loadboard.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Carrier {
@@ -13,7 +15,12 @@ public class Carrier {
     private String name;
     private String mcNumber;
     private String phoneNumber;
+    @JsonIgnoreProperties("assignedCarrier")
+//    @JsonManagedReference
+    @OneToMany(mappedBy = "assignedCarrier", cascade = CascadeType.ALL)
+    private List<Load> assignedLoads = new ArrayList<>();
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -44,5 +51,13 @@ public class Carrier {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public List<Load> getAssignedLoads() {
+        return assignedLoads;
+    }
+
+    public void setAssignedLoads(List<Load> assignedLoads) {
+        this.assignedLoads = assignedLoads;
     }
 }

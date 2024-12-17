@@ -13,11 +13,18 @@ public class CarrierService {
     public CarrierService(CarrierRepository carrierRepository) {
         this.carrierRepository = carrierRepository;
     }
+
     public Carrier createCarrier(Carrier carrier) {
         return carrierRepository.save(carrier);
     }
+
     public List<Carrier> getAllCarriers() {
         return carrierRepository.findAll();
+    }
+
+    public Carrier getCarrierById(Long id) {
+        return carrierRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Carrier not found"));
     }
 
 }
